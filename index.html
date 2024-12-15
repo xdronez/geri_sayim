@@ -23,8 +23,9 @@
         }
         #progress-bar {
             height: 100%;
-            width: 100%; /* Bar başlangıçta %100 olacak */
+            width: 0%; /* Bar başlangıçta %0 olacak */
             background-color: #4CAF50; /* Yeşil Renk */
+            transition: width 1s linear;
         }
         #progress-text {
             margin-top: 10px;
@@ -34,13 +35,49 @@
     </style>
 </head>
 <body>
-    <div id="countdown">Süre doldu!</div>
+    <div id="countdown">Yükleniyor...</div>
     <div id="progress-container">
         <div id="progress-bar"></div>
     </div>
-    <div id="progress-text">100%</div>
+    <div id="progress-text">0%</div>
     <script>
-        function confettiEffect() {
+        const startDate = new Date("2024-12-05T00:00:00").getTime(); // Biletlerin alındığı tarih
+        const targetDate = new Date("2025-01-24T06:00:00").getTime(); // Hedef tarih
+        const countdownElement = document.getElementById("countdown");
+        const progressBar = document.getElementById("progress-bar");
+        const progressText = document.getElementById("progress-text");
+        const totalDuration = targetDate - startDate; // Toplam süre
+
+        function updateCountdown() {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            if (distance < 0) {
+                countdownElement.innerText = "Süre doldu!";
+                progressBar.style.width = "100%";
+                progressText.innerText = "100%";
+                startConfettiEffect(); // %100 olunca konfeti başlat
+                return;
+            }
+
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            countdownElement.innerText = `${days} gün ${hours} saat ${minutes} dakika ${seconds} saniye`;
+
+            // Progress bar'ı güncelle
+            const elapsed = now - startDate; // Geçen süre
+            const progress = Math.min(100, (elapsed / totalDuration) * 100); // Yüzde hesapla (max %100)
+            progressBar.style.width = progress + "%";
+            progressText.innerText = Math.floor(progress) + "%";
+        }
+
+        updateCountdown(); // Sayfa yüklenir yüklenmez güncelle
+        setInterval(updateCountdown, 1000); // Her saniye güncelle
+
+        function startConfettiEffect() {
             const script = document.createElement('script');
             script.src = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js';
             script.onload = () => {
@@ -75,14 +112,14 @@
                         fadeOutEffect(confettiInstance);
                         // Bir sonraki efekti başlat
                         if (playCount < maxPlays) {
-                            setTimeout(launchConfetti, 100); // Silinmeden sonra 1 saniye bekle
+                            setTimeout(launchConfetti, 1000); // Silinmeden sonra 1 saniye bekle
                         }
-                    }, 1000); // Efektin süresi (2 saniye)
+                    }, 2000); // Efektin süresi (2 saniye)
                 }
 
                 // Parçacıkların yavaşça kaybolmasını sağlayan fonksiyon
                 function fadeOutEffect(confettiInstance) {
-                    const fadeOutTime = 2750; // Kaybolma süresi 2.75 saniyeye çıkarıldı
+                    const fadeOutTime = 3000; // Kaybolma süresi 3 saniye
                     const step = 50; // Her adımda opacity ne kadar azalacak
                     let opacity = 1; // Başlangıç opacity
 
@@ -101,10 +138,6 @@
 
             document.body.appendChild(script);
         }
-
-        // Efekti başlat
-        document.getElementById("countdown").innerText = "Süre doldu!";
-        confettiEffect();
     </script>
 </body>
 </html>
