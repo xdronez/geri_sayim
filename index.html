@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Geri Sayım</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 10%;
+        }
+        #countdown {
+            font-size: 2em;
+            color: #333;
+        }
+        #progress-container {
+            width: 80%;
+            background-color: #ddd;
+            margin: 20px auto;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        #progress-bar {
+            height: 100%;
+            width: 100%; /* Bar başlangıçta %100 olacak */
+            background-color: #4CAF50; /* Yeşil Renk */
+        }
+        #progress-text {
+            margin-top: 10px;
+            font-size: 1.2em;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div id="countdown">Süre doldu!</div>
+    <div id="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+    <div id="progress-text">100%</div>
+    <script>
+        function confettiEffect() {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js';
+            script.onload = () => {
+                let playCount = 0; // Döngü sayacı
+                const maxPlays = 5; // Maksimum tekrar sayısı
+
+                function launchConfetti() {
+                    if (playCount >= maxPlays) {
+                        return; // Maksimum döngüye ulaşıldıysa çık
+                    }
+
+                    const confettiInstance = confetti.create(null, { resize: true });
+
+                    // Top şeklinde patlayan konfeti efekti
+                    confettiInstance({
+                        particleCount: 200, // Parçacık sayısı
+                        startVelocity: 25, // Daha yavaş patlama efekti
+                        spread: 360, // 360 derece yayılma (top efekti)
+                        ticks: 200, // Parçacıkların yaşam süresi
+                        scalar: 1.2, // Parçacık boyutları
+                        colors: ['#ff0000', '#ff7f00', '#ffff00', '#00ff00', '#0000ff', '#4b0082', '#9400d3'], // Gökkuşağı renkleri
+                        origin: {
+                            x: Math.random(), // X ekseninde rastgele bir başlangıç
+                            y: Math.random() / 2 // Üst yarıda rastgele bir başlangıç
+                        }
+                    });
+
+                    playCount++; // Döngü sayısını artır
+
+                    // Efekti temizlemek için yavaşça kaybolmasını sağla
+                    setTimeout(() => {
+                        fadeOutEffect(confettiInstance);
+                        // Bir sonraki efekti başlat
+                        if (playCount < maxPlays) {
+                            setTimeout(launchConfetti, 100); // Silinmeden sonra 1 saniye bekle
+                        }
+                    }, 1000); // Efektin süresi (2 saniye)
+                }
+
+                // Parçacıkların yavaşça kaybolmasını sağlayan fonksiyon
+                function fadeOutEffect(confettiInstance) {
+                    const fadeOutTime = 2750; // Kaybolma süresi 2.75 saniyeye çıkarıldı
+                    const step = 50; // Her adımda opacity ne kadar azalacak
+                    let opacity = 1; // Başlangıç opacity
+
+                    const fadeInterval = setInterval(() => {
+                        opacity -= step / fadeOutTime;
+                        if (opacity <= 0) {
+                            clearInterval(fadeInterval);
+                            confettiInstance.reset(); // Tamamen kaybolduktan sonra temizle
+                        }
+                    }, step);
+                }
+
+                // İlk efekti başlat
+                launchConfetti();
+            };
+
+            document.body.appendChild(script);
+        }
+
+        // Efekti başlat
+        document.getElementById("countdown").innerText = "Süre doldu!";
+        confettiEffect();
+    </script>
+</body>
+</html>
